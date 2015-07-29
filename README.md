@@ -11,15 +11,15 @@ Install-Package log4net.dynamodb
 ```
 
 ## Configuration
-You can set up the appender by adding it to the <appenders> section of your existing log4net configuraiton in App.config or Web.config. 
+You can set up the appender by adding it to the <appenders> section of your existing log4net configuration in App.config or Web.config. 
 For example, using the standard log4net layout:
 ```
 <log4net debug="true">
   <root>
     <level value="ALL" />
-    <appender-ref ref="DynmoDbAppender" />
+    <appender-ref ref="DynamoDbAppender" />
   </root>
-  <appender name="DynmoDbAppender" type="log4net.Appender.DynamoDbAppender, log4net.dynamodb">
+  <appender name="DynamoDbAppender" type="log4net.Appender.DynamoDbAppender, log4net.dynamodb">
     <tableName value="log4net" />
     <bufferSize value="512" />
     <threshold value="DEBUG" />
@@ -92,7 +92,7 @@ The **type** element specifies the corresponding DynamoDb type. Currently the S,
 will default the column to the S (string) type.
 
 Additionally, custom parameters can be writen to Dynamo using **ThreadContext.Properties[]**. For example, you could write a binary 
-object by adding the following line to of code to your application (the "myapp:" predicate has no special meaning to log4net; it is 
+object by adding the following line of code to your application (the "myapp:" predicate has no special meaning to log4net; it is 
 used only for disambiguation and you are free to change this to something meaningful to your application):
 ```
 ThreadContext.Properties["myapp:ImportantObject"] = new Tuple<string, int>("Number", 42);
@@ -118,8 +118,7 @@ Complete exception objects can be serialized to Dynamo in much the same way. For
 ```
 
 Note that you must set the **AWSAccessKey** and **AWSSecretKey** configuration elements in the appConfig section of your App.config or 
-Web.config file for authentication to DynamoDb. See the AWS documentation for more information. [These release notes](http://aws.amazon.com/releasenotes/.NET/7526512651260522) 
-are a good starting point.
+Web.config file for authentication to DynamoDb. See the [AWS documentation for configuring credentials](http://docs.aws.amazon.com/AWSSdkDocsNET/latest/V2/DeveloperGuide/net-dg-config-creds.html) for more information. 
 
 The following addtional parameters are available in the appender configuration:
 ```
@@ -130,8 +129,8 @@ This is the name of the table that messages will be written to.
 ```
 <serviceEndpoint value="anAwsEndpoint" />
 ```
-The service endpoint to use for AWS DynamoDb connections. This element is optiona; ommitting it will force the appender to use the default 
-DynamoDb region (http://dynamodb.us-east-1.amazonaws.com).
+The service endpoint to use for AWS DynamoDb connections. This element is optional; ommitting it will force the appender to use the default 
+DynamoDb region (https://dynamodb.us-east-1.amazonaws.com).
 
 See App.config in the test project for a complete configuration example.
 
@@ -159,7 +158,7 @@ log4net.dynamodb is written in C# and requires the MS.NET Framework version 4.0.
 is log4net, which will be installed automatically by Nuget when you build the solution.
 
 ## Issues
-If you find an bug please [open an issue](https://github.com/kcargile/log4net.dynamodb/issues).
+If you find an bug please [open an issue](https://github.com/taylan/log4net.dynamodb/issues).
 
 ## License
 See LICENSE. Copyright (c) 2013, Cargile Technology Group, LLC.
