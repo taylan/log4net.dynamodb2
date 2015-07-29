@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Amazon.DynamoDBv2;
-using Amazon.DynamoDBv2.DataModel;
-using Amazon.DynamoDBv2.DocumentModel;
+using System.Linq;
 using Amazon.DynamoDBv2.Model;
 using log4net.Core;
 
 namespace log4net.Appender
 {
     /// <summary>
-    /// A log4net appender that writes log output to an Amazon Web Services DynamoDb database.
+    /// A log4net appender that writes log output to an Amazon Web Services DynamoDb table.
     /// </summary>
     public class DynamoDbAppender : BufferingAppenderSkeleton, IDisposable
     {
@@ -27,7 +25,7 @@ namespace log4net.Appender
         /// Gets or sets the DynamoDb domain/table name. Defaults to "log4net".
         /// </summary>
         /// <value>The name of the table.</value>
-        public virtual string TableName { get; set; }
+        public string TableName { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating which DynamoDb service endpoint to use. Uses the <see cref="DynamoDbDataWriter"/> default if none is specified.
@@ -74,26 +72,18 @@ namespace log4net.Appender
         /// </remarks>
         protected override void SendBuffer(LoggingEvent[] events)
         {
-            if (null == DataWriter)
+            if (DataWriter == null)
             {
-                DataWriter = new DynamoDbDataWriter(ServiceEndpoint);
+                DataWriter = new DynamoDbDataWriter(ServiceEndpoint, TableName);
             }
 
-            foreach (LoggingEvent e in events)
+            List<Dictionary<string, AttributeValue>> itemList = new List<Dictionary<string, AttributeValue>>();
+            foreach (LoggingEvent loggingEvent in events)
             {
-                PutItemRequest request = new PutItemRequest
-                {
-                    TableName = TableName,
-                    Item = new Dictionary<string, AttributeValue>()
-                };
-
-                foreach (DynamoDbAppenderParameter param in Parameters)
-                {
-                    param.AddFormatParameter(request, e);
-                }
-
-                DataWriter.Write(request);
+                itemList.Add(Parameters.Select(param => param.GetItemAttribute(loggingEvent)).ToDictionary(t => t.Name, t => t.Value));
             }
+
+            DataWriter.WriteItems(itemList);
         }
 
         /// <summary>
@@ -116,7 +106,6 @@ namespace log4net.Appender
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -136,11 +125,10 @@ namespace log4net.Appender
         /// </summary>
         protected virtual void DisposeDataWriter()
         {
-            if (DataWriter != null)
-            {
-                DataWriter.Dispose();
-                DataWriter = null;
-            }
+            if (DataWriter == null)
+                return;
+            DataWriter.Dispose();
+            DataWriter = null;
         }
     }
 }

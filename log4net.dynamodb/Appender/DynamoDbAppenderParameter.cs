@@ -1,6 +1,6 @@
-﻿using Amazon.DynamoDBv2.Model;
+﻿using System;
+using Amazon.DynamoDBv2.Model;
 using log4net.Core;
-using log4net.Extensions;
 using log4net.Layout;
 
 namespace log4net.Appender
@@ -40,7 +40,7 @@ namespace log4net.Appender
         public virtual string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the parameter type. Synonymous wth DynamoDb field type identifiers.
+        /// Gets or sets the parameter type. Synonymous with DynamoDb field type identifiers.
         /// </summary>
         /// <value>
         /// The type of this parameter.
@@ -63,50 +63,30 @@ namespace log4net.Appender
         /// </remarks>
         public IRawLayout Layout { get; set; }
 
-        /// <summary>
-        /// Formats and adds the parameter to the <see cref="PutItemRequest"/>.
-        /// </summary>
-        /// <param name="request">The request.</param>
-        /// <param name="loggingEvent">The logging event.</param>
-        /// <returns>Chainable reference to the original request.</returns>
-        public virtual PutItemRequest AddFormatParameter(PutItemRequest request, LoggingEvent loggingEvent)
+        public virtual DynamoDbItemAttributeValue GetItemAttribute(LoggingEvent loggingEvent)
         {
-            request.CheckNull("request");
-            loggingEvent.CheckNull("loggingEvent");
-
             object formattedValue = Layout.Format(loggingEvent);
-            return AddToItemsIfNotNullOrEmpty(request, formattedValue);
+            return new DynamoDbItemAttributeValue(this.Name, this.BuildAttributeValue(formattedValue));
         }
 
-        /// <summary>
-        /// Add the specifed string item to the <c>Request.Items</c> collection if it is not empty.
-        /// </summary>
-        /// <param name="request">The <see cref="PutItemRequest"/>.</param>
-        /// <param name="logItem">The log item.</param>
-        /// <returns>Chainable reference to the original request.</returns>
-        protected virtual PutItemRequest AddToItemsIfNotNullOrEmpty(PutItemRequest request, object logItem)
+        public virtual Tuple<string, AttributeValue> GetAttribute(LoggingEvent loggingEvent)
         {
-            request.CheckNull("request");
+            object formattedValue = Layout.Format(loggingEvent);
+            return new Tuple<string, AttributeValue>(this.Name, this.BuildAttributeValue(formattedValue));
+        }
 
-            if (null != logItem && !string.IsNullOrEmpty(logItem.ToString()))
+        protected AttributeValue BuildAttributeValue(object logItem)
+        {
+            DynamoDbAttributeBuilder builder = new DynamoDbAttributeBuilder();
+            switch (Type)
             {
-                DynamoDbAttributeBuilder builder = new DynamoDbAttributeBuilder();
-
-                switch (Type)
-                {
-                    case ParameterType.B:
-                        request.Item.Add(Name, builder.BuildAttributeForTypeBinary(logItem));
-                        break;
-                    case ParameterType.N:
-                        request.Item.Add(Name, builder.BuildAttributeForTypeNumeric(logItem));
-                        break;
-                    default:
-                        request.Item.Add(Name, builder.BuildAttributeForTypeString(logItem));
-                        break;
-                }
+                case ParameterType.B:
+                    return builder.BuildAttributeForTypeBinary(logItem);
+                case ParameterType.N:
+                    return builder.BuildAttributeForTypeNumeric(logItem);
+                default:
+                    return builder.BuildAttributeForTypeString(logItem);
             }
-
-            return request;
         }
     }
 }

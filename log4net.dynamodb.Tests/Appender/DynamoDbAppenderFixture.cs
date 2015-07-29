@@ -27,7 +27,7 @@ namespace log4net.Tests.Appender
             // using a binary field
             ThreadContext.Properties["log4net:ImportantObject"] = new Tuple<string, int>("Number", 42);
 
-            // log it; the actual exception will also be seriialized and logged in this configuration
+            // log it; the actual exception will also be serialized and logged in this configuration
             Assert.DoesNotThrow(() => Logger.Error("An error occured.", new ApplicationException("You did something stupid!")));
         }
     }

@@ -1,17 +1,16 @@
 <?xml version="1.0"?>
-<package >
+<package>
   <metadata>
     <id>$id$</id>
     <version>$version$</version>
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
-    <licenseUrl>https://github.com/kcargile/log4net.dynamodb/blob/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/kcargile/log4net.dynamodb</projectUrl>
+    <licenseUrl>https://github.com/taylan/log4net.dynamodb/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/taylan/log4net.dynamodb</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Add parameters support, add support for multiple AWS endpoints, bug fixes, miscellaneous refactoring.</releaseNotes>
-    <copyright>Copyright (c) 2013 Cargile Technology Group, LLC</copyright>
+    <copyright>Copyright (c) 2015</copyright>
     <tags>log4net dynamodb aws nosql</tags>
   </metadata>
   <files>

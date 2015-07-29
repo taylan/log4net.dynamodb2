@@ -11,14 +11,14 @@ namespace log4net.Tests.Appender
     [TestFixture]
     public class DynamoDbAttributeBuilderFixture
     {
-        private readonly DynamoDbAttributeBuilder _builder = new DynamoDbAttributeBuilder();
+        private readonly DynamoDbAttributeBuilder builder = new DynamoDbAttributeBuilder();
 
         [Test]
         public void BuildStringAttributeSuceeds()
         {
             const string item = "TESTING1234";
 
-            AttributeValue value = _builder.BuildAttributeForTypeString(item);
+            AttributeValue value = builder.BuildAttributeForTypeString(item);
             Assert.IsNotNull(value);
             Assert.AreEqual(item, value.S);
         }
@@ -26,7 +26,7 @@ namespace log4net.Tests.Appender
         [Test]
         public void BuildStringAttributeWithNullItemFails()
         {
-            Assert.Throws<ArgumentNullException>(() => _builder.BuildAttributeForTypeString(null));
+            Assert.Throws<ArgumentNullException>(() => builder.BuildAttributeForTypeString(null));
         }
 
         [Test]
@@ -34,7 +34,7 @@ namespace log4net.Tests.Appender
         {
             const int item = 42;
 
-            AttributeValue value = _builder.BuildAttributeForTypeNumeric(item);
+            AttributeValue value = builder.BuildAttributeForTypeNumeric(item);
             Assert.IsNotNull(value);
             Assert.AreEqual(item, int.Parse(value.N));
         }
@@ -42,14 +42,14 @@ namespace log4net.Tests.Appender
         [Test]
         public void BuildNumericAttributeWithNullItemFails()
         {
-            Assert.Throws<ArgumentNullException>(() => _builder.BuildAttributeForTypeNumeric(null));
+            Assert.Throws<ArgumentNullException>(() => builder.BuildAttributeForTypeNumeric(null));
         }
 
         [Test]
         public void BuildBinaryAttributeSuceeds()
         {
             Tuple<string, int> item = new Tuple<string, int>("Number", 42);
-            AttributeValue value = _builder.BuildAttributeForTypeBinary(item);
+            AttributeValue value = builder.BuildAttributeForTypeBinary(item);
             Assert.IsNotNull(value);
 
             using (MemoryStream serialized = new MemoryStream())
@@ -64,7 +64,7 @@ namespace log4net.Tests.Appender
         [Test]
         public void BuildBinaryAttributeWithNullItemFails()
         {
-            Assert.Throws<ArgumentNullException>(() => _builder.BuildAttributeForTypeBinary(null));
+            Assert.Throws<ArgumentNullException>(() => builder.BuildAttributeForTypeBinary(null));
         }
     }
 }

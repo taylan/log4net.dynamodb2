@@ -1,20 +1,22 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.DynamoDBv2.Model;
-using log4net.Extensions;
 
 namespace log4net.Appender
 {
     /// <summary>
     /// Data writer for persisting data to Amazon DynamoDb tables.
     /// </summary>
-    public class DynamoDbDataWriter : IDataWriter<PutItemRequest>
+    public class DynamoDbDataWriter : IDisposable
     {
+        private bool disposed;
+
         /// <summary>
         /// Default service endpoint. Will be used if none is specified.
         /// </summary>
-        protected const string DefaultServiceEndpoint = "http://dynamodb.us-east-1.amazonaws.com";
+        protected const string DefaultServiceEndpoint = "https://dynamodb.us-east-1.amazonaws.com";
 
         /// <summary>
         /// Amazon DynamoDb client.
@@ -22,46 +24,42 @@ namespace log4net.Appender
         protected AmazonDynamoDBClient DynamoDbClient;
 
         /// <summary>
+        /// Table
+        /// </summary>
+        protected Table LogTable { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DynamoDbDataWriter"/> class.
         /// </summary>
         public DynamoDbDataWriter() : this(DefaultServiceEndpoint)
         {
-
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DynamoDbDataWriter"/> class.
         /// </summary>
         /// <param name="endpoint">The AWS DynamoDb service endpoint.</param>
-        public DynamoDbDataWriter(string endpoint)
+        /// <param name="tableName">Name of the table used for logging.</param>
+        public DynamoDbDataWriter(string endpoint, string tableName="")
         {
             if (string.IsNullOrEmpty(endpoint))
             {
                 endpoint = DefaultServiceEndpoint;
             }
 
-            DynamoDbClient = new AmazonDynamoDBClient(new AmazonDynamoDBConfig { ServiceURL = endpoint });
+            DynamoDbClient = new AmazonDynamoDBClient(new AmazonDynamoDBConfig {ServiceURL = endpoint});
+            LogTable = Table.LoadTable(DynamoDbClient, tableName);
         }
 
         /// <summary>
-        /// Writes the specified item to SimpleDb.
+        /// Writes the specified items to DynamoDb with a batch write.
         /// </summary>
-        /// <param name="item">The item.</param>
-        public virtual void Write(PutItemRequest item)
+        /// <param name="items">The items.</param>
+        public virtual void WriteItems(List<Dictionary<string, AttributeValue>> items)
         {
-            item.CheckNull("item");
-
-            try
-            {
-                DynamoDbClient.PutItem(item);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("There was an error writing to DynamoDb: {0}.", ex);
-#if DEBUG
-                throw;
-#endif
-            }
+            DocumentBatchWrite batchWrite = this.LogTable.CreateBatchWrite();
+            items.ForEach(i => batchWrite.AddDocumentToPut(Document.FromAttributeMap(i)));
+            batchWrite.Execute();
         }
 
         /// <summary>
@@ -70,7 +68,6 @@ namespace log4net.Appender
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -79,14 +76,14 @@ namespace log4net.Appender
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                if (null != DynamoDbClient)
-                {
-                    DynamoDbClient.Dispose();
-                    DynamoDbClient = null;
-                }
-            }
+            if (disposed)
+                return;
+            if (!disposing)
+                return;
+
+            if(this.DynamoDbClient != null)
+                this.DynamoDbClient.Dispose();
+            disposed = true;
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using Amazon.DynamoDBv2.Model;
 using Microsoft.VisualBasic;
 using log4net.Core;
-using log4net.Extensions;
 
 namespace log4net.Appender
 {
@@ -14,6 +14,8 @@ namespace log4net.Appender
     /// </summary>
     public class DynamoDbAttributeBuilder
     {
+        private readonly CultureInfo invariantCulture = CultureInfo.InvariantCulture;
+
         /// <summary>
         /// Builds the attribute for a binary field type.
         /// </summary>
@@ -21,13 +23,14 @@ namespace log4net.Appender
         /// <returns>A properly configured <see cref="AttributeValue"/> containing the serialized item.</returns>
         public virtual AttributeValue BuildAttributeForTypeBinary(object logItem)
         {
-            logItem.CheckNull("logItem");
+            if (logItem == null)
+                return new AttributeValue { NULL = true };
 
-            using (MemoryStream serialized = new MemoryStream())
+            using (MemoryStream ms = new MemoryStream())
             {
-                IFormatter formatter = new BinaryFormatter();
-                formatter.Serialize(serialized, logItem);
-                return new AttributeValue { B = serialized };
+                BinaryFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(ms, logItem);
+                return new AttributeValue { B = ms };
             }
         }
 
@@ -38,8 +41,8 @@ namespace log4net.Appender
         /// <returns>A properly configured <see cref="AttributeValue"/> containing the string representation of the item.</returns>
         public virtual AttributeValue BuildAttributeForTypeString(object logItem)
         {
-            logItem.CheckNull("logItem");
-            logItem.ToString().CheckNullOrEmpty("logItem");
+            if (logItem == null)
+                return new AttributeValue { NULL = true };
 
             return new AttributeValue { S = logItem.ToString() };
         }
@@ -51,14 +54,20 @@ namespace log4net.Appender
         /// <returns>A properly configured <see cref="AttributeValue"/> containing the numeric representation of the item.</returns>
         public virtual AttributeValue BuildAttributeForTypeNumeric(object logItem)
         {
-            logItem.CheckNull("logItem");
+            if (logItem == null)
+                return new AttributeValue { NULL = true };
 
-            if (!Information.IsNumeric(logItem.ToString()))
+            decimal logItemValue;
+            if(!decimal.TryParse(logItem.ToString(), NumberStyles.Float, this.invariantCulture, out logItemValue))
             {
                 throw new ArgumentException(Properties.Resources.ItemNotNumeric);
             }
 
-            return new AttributeValue { N = logItem.ToString() };
+            int decimalPlaces = Math.Floor(logItemValue) == logItemValue
+                ? 0
+                : logItemValue.ToString(this.invariantCulture).Split('.')[0].TrimEnd('0').Length;
+
+            return new AttributeValue { N = logItemValue.ToString(string.Format("F{0}", decimalPlaces), this.invariantCulture) };
         }
     }
 }
