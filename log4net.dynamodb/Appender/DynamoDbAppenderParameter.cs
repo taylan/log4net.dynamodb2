@@ -1,4 +1,4 @@
-﻿using Amazon.DynamoDB.Model;
+﻿using Amazon.DynamoDBv2.Model;
 using log4net.Core;
 using log4net.Extensions;
 using log4net.Layout;
@@ -91,6 +91,7 @@ namespace log4net.Appender
             if (null != logItem && !string.IsNullOrEmpty(logItem.ToString()))
             {
                 DynamoDbAttributeBuilder builder = new DynamoDbAttributeBuilder();
+
                 switch (Type)
                 {
                     case ParameterType.B:
