@@ -1,13 +1,13 @@
-# log4net.dynamodb
-================
+# log4net.dynamodb2
+===================
 
-An Amazon Web Services DynamoDb log4net appender. The appender is templated so that custom DynamoDb schemas can be used, 
+An Amazon Web Services DynamoDB log4net appender using AWS SDK v2. The appender is templated so that custom DynamoDb schemas can be used, 
 and is buffered to optimize performance. Three DynamoDb data types (S, N, B) are supported.
 
 ## Installation
 Install the package via nuget using the following command:
 ```
-Install-Package log4net.dynamodb
+Install-Package log4net.dynamodb2
 ```
 
 ## Configuration
@@ -19,7 +19,7 @@ For example, using the standard log4net layout:
     <level value="ALL" />
     <appender-ref ref="DynamoDbAppender" />
   </root>
-  <appender name="DynamoDbAppender" type="log4net.Appender.DynamoDbAppender, log4net.dynamodb">
+  <appender name="DynamoDbAppender" type="log4net.Appender.DynamoDbAppender, log4net.dynamodb2">
     <tableName value="log4net" />
     <bufferSize value="512" />
     <threshold value="DEBUG" />
@@ -30,7 +30,7 @@ For example, using the standard log4net layout:
         <conversionPattern value="%GUID" />
         <converter>
           <name value="GUID" />
-          <type value="log4net.Layout.PatternLayout.NewGuidPatternLayoutConverter, log4net.dynamodb" />
+          <type value="log4net.Layout.PatternLayout.NewGuidPatternLayoutConverter, log4net.dynamodb2" />
         </converter>
       </layout>
     </parameter>

@@ -1,3 +1,3 @@
-See https://github.com/kcargile/log4net.dynamodb for usage information or to file a bug report.
+See https://github.com/taylan/log4net.dynamodb2 for usage information or to file a bug report.
 
-Release notes are available at https://github.com/kcargile/log4net.dynamodb/blob/master/ReleaseNotes.txt.
+Release notes are available at https://github.com/taylan/log4net.dynamodb2/blob/master/ReleaseNotes.txt.
