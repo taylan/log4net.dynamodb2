@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.DynamoDBv2.Model;
@@ -9,7 +8,7 @@ namespace log4net.Appender
     /// <summary>
     /// Data writer for persisting data to Amazon DynamoDb tables.
     /// </summary>
-    public class DynamoDbDataWriter : IDisposable
+    public class DynamoDbDataWriter : IDynamoDbDataWriter
     {
         private bool disposed;
 
@@ -24,7 +23,7 @@ namespace log4net.Appender
         protected AmazonDynamoDBClient DynamoDbClient;
 
         /// <summary>
-        /// Table
+        /// Table object representing the table in DynamoDb.
         /// </summary>
         protected Table LogTable { get; private set; }
 
