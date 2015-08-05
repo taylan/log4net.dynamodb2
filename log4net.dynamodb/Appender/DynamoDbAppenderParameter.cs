@@ -1,5 +1,4 @@
-﻿using System;
-using Amazon.DynamoDBv2.Model;
+﻿using Amazon.DynamoDBv2.Model;
 using log4net.Core;
 using log4net.Layout;
 
@@ -28,7 +27,12 @@ namespace log4net.Appender
             /// <summary>
             /// Binary type.
             /// </summary>
-            B = 4
+            B = 4,
+
+            /// <summary>
+            /// Boolean type. NULL values for this type will be treated as <c>false</c>.
+            /// </summary>
+            BOOL = 8
         }
 
         /// <summary>
@@ -63,27 +67,31 @@ namespace log4net.Appender
         /// </remarks>
         public IRawLayout Layout { get; set; }
 
-        public virtual DynamoDbItemAttributeValue GetItemAttribute(LoggingEvent loggingEvent)
-        {
-            object formattedValue = Layout.Format(loggingEvent);
-            return new DynamoDbItemAttributeValue(this.Name, this.BuildAttributeValue(formattedValue));
-        }
+        /// <summary>
+        /// Specifies whether null values should be written to DynamoDb or whether they should be ignored.
+        /// If this is set to <c>true</c>, and the value for this parameter is null, this property will be saved to DynamoDb and will have type 'NULL: true'.
+        /// If this is set to <c>false</c>, this property will not be saved to DynamoDb when its value is null.
+        /// Please see <see cref="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DataModel.html">DynamoDb Data Model documentation</see> for more info.
+        /// </summary>
+        public virtual bool IncludeNullValues { get; set; }
 
-        public virtual Tuple<string, AttributeValue> GetAttribute(LoggingEvent loggingEvent)
+        public virtual DynamoDbItemAttribute GetItemAttribute(LoggingEvent loggingEvent)
         {
             object formattedValue = Layout.Format(loggingEvent);
-            return new Tuple<string, AttributeValue>(this.Name, this.BuildAttributeValue(formattedValue));
+            return new DynamoDbItemAttribute(this.Name, this.BuildAttributeValue(formattedValue));
         }
 
         protected AttributeValue BuildAttributeValue(object logItem)
         {
-            DynamoDbAttributeBuilder builder = new DynamoDbAttributeBuilder();
+            DynamoDbAttributeBuilder builder = new DynamoDbAttributeBuilder(this.IncludeNullValues);
             switch (Type)
             {
                 case ParameterType.B:
                     return builder.BuildAttributeForTypeBinary(logItem);
                 case ParameterType.N:
                     return builder.BuildAttributeForTypeNumeric(logItem);
+                case ParameterType.BOOL:
+                    return builder.BuildAttributeForTypeBoolean(logItem);
                 default:
                     return builder.BuildAttributeForTypeString(logItem);
             }
