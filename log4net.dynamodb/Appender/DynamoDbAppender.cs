@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Amazon.DynamoDBv2.Model;
 using log4net.Core;
+using log4net.Repository.Hierarchy;
 
 namespace log4net.Appender
 {
@@ -30,7 +31,7 @@ namespace log4net.Appender
         /// <summary>
         /// Gets or sets a value indicating which DynamoDb service endpoint to use. Uses the <see cref="DynamoDbDataWriter"/> default if none is specified.
         /// </summary>
-        /// <value>The DynamoDb service endpoint with the "http://" moniker included.</value>
+        /// <value>The DynamoDb service endpoint (with the "http://" or "https://" protocol specifier).</value>
         public virtual string ServiceEndpoint { get; set; }
 
         /// <summary>

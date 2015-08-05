@@ -2,12 +2,12 @@
 
 namespace log4net.Appender
 {
-    public class DynamoDbItemAttributeValue
+    public class DynamoDbItemAttribute
     {
         public string Name { get; private set; }
         public AttributeValue Value { get; private set; }
 
-        public DynamoDbItemAttributeValue(string name, AttributeValue value)
+        public DynamoDbItemAttribute(string name, AttributeValue value)
         {
             this.Name = name;
             this.Value = value;
