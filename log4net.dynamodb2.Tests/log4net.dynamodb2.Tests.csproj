@@ -70,7 +70,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\log4net.dynamodb\log4net.dynamodb2.csproj">
+    <ProjectReference Include="..\log4net.dynamodb2\log4net.dynamodb2.csproj">
       <Project>{D5B98419-7691-463A-8F7C-2B3D13F89233}</Project>
       <Name>log4net.dynamodb2</Name>
     </ProjectReference>

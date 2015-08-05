@@ -6,8 +6,8 @@
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
-    <licenseUrl>https://github.com/taylan/log4net.dynamodb/blob/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/taylan/log4net.dynamodb</projectUrl>
+    <licenseUrl>https://github.com/taylan/log4net.dynamodb2/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/taylan/log4net.dynamodb2</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <copyright>Copyright (c) 2015</copyright>
