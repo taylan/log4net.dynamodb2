@@ -1,5 +1,4 @@
 # log4net.dynamodb2
-===================
 
 An Amazon Web Services DynamoDB log4net appender using AWS SDK v2. The appender is templated so that custom DynamoDb schemas can be used, 
 and is buffered to optimize performance. Three DynamoDb data types (S, N, B) are supported.
